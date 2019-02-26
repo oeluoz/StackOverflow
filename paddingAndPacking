@@ -1,0 +1,61 @@
+#include<stdio.h>
+/**填充
+Padding aligns(填充对齐) structure members to "natural"
+address boundaries - say, int members would
+have offsets(补充), which are mod(4) == 0 on 32-bit
+platform. Padding is on by default(默认条件下填充是开启的). It inserts
+the following "gaps" into your first structure:
+*/
+//origin structure
+struct mystruct_A{
+   char a;
+   int b;
+   char c;
+} x;
+/*padding structure
+struct mystruct_A {
+    char a;
+    char gap_0[3]; //inserted by compiler: for alignment of b
+    int b;
+    char c;
+    char gap_1[3]; // -"-: for alignment of the whole struct in an array
+} x;
+*/
+
+struct mystruct_B{
+   int b;
+   char a;
+   //char gap_0[3];
+} y;
+
+struct mystruct_C{
+    char ch;
+    //char gap_0[7];填充7个字节对齐
+    double dou;
+} z;
+
+/**
+Packing(打包), on the other hand prevents compiler from
+doing padding - this has to be explicitly requested
+- under GCC it's __attribute__((__packed__)), so the following:
+*/
+struct __attribute__((__packed__)) mystruct_D {
+    char a;
+    int b;
+    char c;
+}a;
+int main()
+{
+    printf("x:%d\n",sizeof(x));
+    printf("y:%d\n",sizeof(y));
+    printf("z:%d\n",sizeof(z));
+    printf("a:%d\n",sizeof(a));
+
+    printf("double:%d\n",sizeof(double));
+    printf("int:%d\n",sizeof(int));
+    printf("char:%d\n",sizeof(char));
+}
+/**A note though - unaligned memory access is slower on
+architectures that allow it (like x86 and amd64),
+在条件允许的情况下，非对齐内存读取往往更慢
+and is explicitly prohibited on strict alignment architectures like SPARC.
